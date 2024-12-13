@@ -8,6 +8,7 @@ const BookingController = require('../controllers/admin/BookingController.js');
 const BannerController=require('../controllers/admin/BannerOfferController.js')
 const locationController=require('../controllers/admin/LocationController.js')
 const DashboardController=require('../controllers/admin/DashboardController.js')
+const SubscriptionController=require('../controllers/admin/Subscription.js')
 const s3UploadMiddleware=require('../middleware/multer.js')
 const router = express.Router();
 // Authentication
@@ -32,6 +33,10 @@ router.post('/addservices', s3UploadMiddleware, serviceController.createService)
 router.post('/blockServices/:id', serviceController.blockServices);
 router.put('/editservice/:id', serviceController.updateService);
 router.delete('/deleteservices/:id', serviceController.deleteService);
+// Offer routes
+router.post('/addoffer/:id', serviceController.addOffer); 
+router.put('/editoffer/:id', serviceController.editOffer);  
+router.post('/deleteoffer/:id', serviceController.deleteOffer); 
 
 // Category
 router.post("/addcategory", categoryController.addCategory);
@@ -71,5 +76,10 @@ router.get('/getBooking', DashboardController.getBookingCount);
 router.get('/getLocation', DashboardController.getLocationCount);
 router.get('/getMostUsedServices', DashboardController.getMostUsedServices);
 
-
+// subscription
+router.get('/getPlans',SubscriptionController.getPlans)
+router.post('/addPlans',SubscriptionController.addPlans)
+router.put('/editPlans/:id',SubscriptionController.editPlans)
+router.delete("/delete/:id",SubscriptionController.deletePlans)
+router.post('/blockPlans/:id',SubscriptionController.blockorUnblockPlans)
 module.exports = router;

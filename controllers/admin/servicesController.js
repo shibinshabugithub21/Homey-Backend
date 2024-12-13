@@ -1,16 +1,10 @@
 const Service = require('../../models/Services');
+const { off } = require('../../models/User');
 
 // Create a new service
 const createService = async (req, res) => {
-  
-  console.log("the services controller start form heree");
-  
-  const { name, category } = req.body;
-  console.log("boddy",req.body);
-  
-
-  console.log("img",req.url);
-  if (!name || !category ) {
+  const { name, category,offer } = req.body;
+  if (!name || !category || !offer) {
     return res.status(400).json({
       success: false,
       message: "All fields (name, category) are required.",
@@ -26,10 +20,8 @@ const createService = async (req, res) => {
       });
     }
 
-const iconUrl =  req.url;
-
-
-    const newService = new Service({ name, category, icon: iconUrl }); // Use location from S3
+    const iconUrl = req.url;
+    const newService = new Service({ name, category, icon: iconUrl,offer });
     const savedService = await newService.save();
 
     res.status(201).json({
@@ -105,10 +97,83 @@ const deleteService = async (req, res) => {
   }
 };
 
+// Add an offer to a service
+const addOffer = async (req, res) => {
+  const { id } = req.params;
+  const { offer } = req.body;
+
+  if (!offer || offer.trim() === "") {
+    return res.status(400).json({ success: false, message: 'Offer cannot be empty.' });
+  }
+
+  try {
+    const service = await Service.findById(id);
+    if (!service) {
+      return res.status(404).json({ success: false, message: 'Service not found.' });
+    }
+
+    service.offer = offer;  // Add the offer to the service
+    await service.save();  // Save the updated service
+
+    res.status(200).json({ success: true, message: 'Offer added successfully', service });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Error adding offer.', error: error.message });
+  }
+};
+
+// Edit an existing offer for a service
+const editOffer = async (req, res) => {
+  const { id } = req.params;
+  const { offer } = req.body;
+
+  if (!offer || offer.trim() === "") {
+    return res.status(400).json({ success: false, message: 'Offer cannot be empty.' });
+  }
+
+  try {
+    const service = await Service.findById(id);
+    if (!service) {
+      return res.status(404).json({ success: false, message: 'Service not found.' });
+    }
+
+    service.offer = offer;  // Edit the offer text
+    await service.save();  // Save the updated service
+
+    res.status(200).json({ success: true, message: 'Offer updated successfully', service });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Error updating offer.', error: error.message });
+  }
+};
+
+// Delete offer for a service
+const deleteOffer = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const service = await Service.findById(id);
+    if (!service) {
+      return res.status(404).json({ success: false, message: 'Service not found.' });
+    }
+
+    service.offer = '';  // Remove the offer
+    await service.save();  // Save the updated service
+
+    res.status(200).json({ success: true, message: 'Offer deleted successfully', service });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Error deleting offer.', error: error.message });
+  }
+};
+
 module.exports = {
   createService,
   getAllServices,
   updateService,
   blockServices,
   deleteService,
+  addOffer,
+  editOffer,
+  deleteOffer,
 };

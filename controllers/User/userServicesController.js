@@ -67,4 +67,5 @@ const getLocation=async (req,res) => {
 }
 
 
+
 module.exports = { getAllServices,getServicesById, search,getOffers,getLocation};

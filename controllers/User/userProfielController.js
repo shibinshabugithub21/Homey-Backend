@@ -1,4 +1,5 @@
 const User = require("../../models/User");
+const Premium=require('../../models/Premium')
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -187,5 +188,29 @@ const getUser=async(req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 }
+const getPlans = async (req, res) => {
+  try {
+    const plans = await Premium.find();
+    console.log("palns",plans);
+    
 
-module.exports = { getUserProfile,getUser, changePassword, addAddress, getAddresses, editAddress, deleteAddress };
+    if (plans.length === 0) {
+      return res.status(404).json({ message: "No plans found." });
+    }
+
+    res.status(200).json({
+      message: "Plans fetched successfully.",
+      data: plans,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch plans.",
+      error: error.message,
+    });
+  }
+};
+
+const subscription=async(req,res)=>{
+
+}
+module.exports = { getUserProfile,getUser, changePassword, addAddress, getAddresses, editAddress, deleteAddress,getPlans,subscription};

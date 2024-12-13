@@ -62,12 +62,6 @@ const workerSchema = new mongoose.Schema(
         reason: { type: String, required: true },
       },
     ],
-    // bookings: [
-    //   {
-    //     date: { type: Date, required: true },  
-    //     status: { type: String, enum: ["Booked", "Available"], default: "Booked" },  // Booking status
-    //   },
-    // ],
   },
   { timestamps: true }
 );

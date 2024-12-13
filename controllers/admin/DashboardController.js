@@ -21,7 +21,7 @@ const getWorkerCount = async (req, res) => {
     console.log("dashboard worker count start");
     
     try {
-        const workerCount = await Worker.countDocuments(); 
+        const workerCount = await Worker.countDocuments();
         return res.status(200).json({ worker: workerCount }); 
       } catch (err) {
         return res.status(500).json({ message: "Error fetching worker count", error: err.message });
@@ -48,7 +48,7 @@ const getWorkerCount = async (req, res) => {
 
   const getBookingCount = async (req, res) => {
     try {
-      const bookingCount = await Booking.countDocuments(); // Count of all bookings
+      const bookingCount = await Booking.countDocuments(); 
       res.status(200).json({ bookings: bookingCount });
     } catch (error) {
       res.status(500).json({ message: "Error fetching bookings", error: error.message });

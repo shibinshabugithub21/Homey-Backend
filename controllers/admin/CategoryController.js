@@ -1,24 +1,37 @@
 const Category=require('../../models/Category.js');
 
+// Add Category Function
 const addCategory = async (req, res) => {
-    const { Category: categoryName } = req.body;
+    const { Category: categoryName, offer } = req.body;  
+    console.log("req", req.body);
+    
     if (!categoryName) {
         return res.status(400).json({ success: false, message: 'Category name is required' });
     }
+
     const lowercaseCategory = categoryName.toLowerCase();
+
     try {
         const existingCategory = await Category.findOne({ Category: lowercaseCategory });
         if (existingCategory) {
             return res.status(400).json({ success: false, message: 'Category already exists' });
         }
-        const newCategory = new Category({ Category: lowercaseCategory });
+
+        const newCategory = new Category({
+            Category: lowercaseCategory,
+            Offer: offer || ""  
+        });
+
         await newCategory.save();
         return res.status(201).json({ success: true, data: newCategory });
+
     } catch (error) {
         console.error("Error adding category:", error);
         return res.status(500).json({ success: false, message: 'Server error' });
     }
 };
+
+
 const getCategories = async (req, res) => {
     try {
       const categories = await Category.find();
@@ -41,7 +54,7 @@ const removeCategory = async (req, res) => {
 //  edit a category
 const editCategory = async (req, res) => {
     const { id } = req.params;
-    const { Category: newCategoryName } = req.body;
+    const { Category: newCategoryName, offer } = req.body; // Accept offer field
 
     if (!newCategoryName) {
         return res.status(400).json({ success: false, message: 'Category name is required.' });
@@ -50,8 +63,11 @@ const editCategory = async (req, res) => {
     try {
         const updatedCategory = await Category.findByIdAndUpdate(
             id,
-            { Category: newCategoryName },
-            { new: true } 
+            { 
+                Category: newCategoryName, 
+                Offer: offer || "" // Update offer if provided
+            },
+            { new: true }
         );
 
         if (!updatedCategory) {
@@ -64,6 +80,7 @@ const editCategory = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };
+
 
 const blockorUnblock = async (req, res) => {
     const { id } = req.params;

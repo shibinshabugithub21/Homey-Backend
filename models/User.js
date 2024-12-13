@@ -22,7 +22,13 @@ const userSchema = new mongoose.Schema(
     dateOfJoin: { type: Date, default: Date.now },
     isBlocked: { type: Boolean, default: false },
    
-    role: { type: String, enum: ["user", "worker", "admin"], default: "user" } 
+    role: { type: String, enum: ["user", "worker", "admin"], default: "user" },
+    premiumStatus: {
+      type: String,
+      enum: ["Premium", "Not Premium"],
+      default: "Not Premium",
+    },
+    premiumId:{type:mongoose.Schema.Types.ObjectId,ref:"Premium",require:true},
   },
   { timestamps: true } 
 );

@@ -61,6 +61,9 @@ router.delete("/deleteAddress/:addressId", ProfileController.deleteAddress);
 router.put("/editAddress/:userId/:addressId", ProfileController.editAddress);
 router.get('/user/:id',ProfileController.getUser)
 
+// subscription
+router.get('/getPlans',ProfileController.getPlans)
+
 // search
 router.get('/services',serviceController.search)
 // Booking

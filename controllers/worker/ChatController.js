@@ -54,7 +54,7 @@ const getUsersForWorker = async (req, res) => {
 
 const getMessages = async (req, res) => {
   const { workerId, userId } = req.params;
-console.log("user",userId,workerId);
+console.log("userffffffffffffffff",userId,workerId);
 
   try {
     // Find all messages between the worker and user
@@ -143,7 +143,6 @@ const createMessage = async (req, res) => {
       message,
       timestamp: Date.now(),
     });
-
     await newMessage.save();
 
     console.log("Message saved successfully:", newMessage);
