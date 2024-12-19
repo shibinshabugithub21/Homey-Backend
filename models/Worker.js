@@ -50,6 +50,11 @@ const workerSchema = new mongoose.Schema(
       enum: ["Booked", "Not Booked"],
       default: "Not Booked",
     },
+    bookingDates:[
+      {
+        type:Date
+      }
+    ],
     role: { type: String, enum: ["user", "worker"], default: "worker" },
     leaves: [
       {

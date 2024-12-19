@@ -130,14 +130,14 @@ app.set('socketio', io);
 
 // Socket.IO connection handling
 io.on('connection', (socket) => {
-  console.log("Client connected");
+  // console.log("Client connected");
 
   socket.on('newWorker', (workerData) => {
     io.emit('newWorker', workerData); 
   });
 
   socket.on('disconnect', () => {
-    console.log('Client disconnected');
+    // console.log('Client disconnected');
   });
 
   socket.on('error', (error) => {

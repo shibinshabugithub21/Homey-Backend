@@ -29,6 +29,7 @@ const userSchema = new mongoose.Schema(
       default: "Not Premium",
     },
     premiumId:{type:mongoose.Schema.Types.ObjectId,ref:"Premium",require:true},
+
   },
   { timestamps: true } 
 );

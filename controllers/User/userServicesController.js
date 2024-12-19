@@ -1,13 +1,28 @@
 const service = require('../../models/Services');
 const Offer=require('../../models/Offer')
 const Location=require('../../models/Location')
+const Category=require('../../models/Category')
+
 const getAllServices = async (req, res) => {
+  console.log("fecth services");
+  
     try {
         const services = await service.find();
         res.status(200).json(services); 
     } catch (error) {
         res.status(500).json({ message: 'Error fetching services', error: error.message });
     }
+};
+
+const getCategories = async (req, res) => {
+  try {
+    const categories = await Category.find();
+    console.log("category",categories);
+    
+    res.json(categories);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching categories." });
+  }
 };
 
 const getServicesById=async(req,res)=>{
@@ -68,4 +83,4 @@ const getLocation=async (req,res) => {
 
 
 
-module.exports = { getAllServices,getServicesById, search,getOffers,getLocation};
+module.exports = { getAllServices,getServicesById,getCategories, search,getOffers,getLocation};

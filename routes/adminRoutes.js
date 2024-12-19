@@ -31,12 +31,9 @@ router.put('/blockUser/:id', UserController.blockUser);
 router.get('/services', serviceController.getAllServices);
 router.post('/addservices', s3UploadMiddleware, serviceController.createService); 
 router.post('/blockServices/:id', serviceController.blockServices);
-router.put('/editservice/:id', serviceController.updateService);
-router.delete('/deleteservices/:id', serviceController.deleteService);
-// Offer routes
-router.post('/addoffer/:id', serviceController.addOffer); 
-router.put('/editoffer/:id', serviceController.editOffer);  
-router.post('/deleteoffer/:id', serviceController.deleteOffer); 
+router.post('/editservice/:id', serviceController.updateService);
+router.delete('/deleteservice/:id', serviceController.deleteService);
+
 
 // Category
 router.post("/addcategory", categoryController.addCategory);

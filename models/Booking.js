@@ -20,6 +20,17 @@ const BookingSchema = new mongoose.Schema({
     enum: ["Unpaid", "Paid"], 
     default: "Unpaid" 
   },  
+  review: [
+    {
+      rating: { 
+        type: Number, 
+        required: true, 
+        min: 1, 
+        max: 5, 
+      },
+      feedback: { type: String, required: true },
+    },
+  ],
   userId:{type:mongoose.Schema.Types.ObjectId,ref:"User",require:true},
   workerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Worker' } 
 });

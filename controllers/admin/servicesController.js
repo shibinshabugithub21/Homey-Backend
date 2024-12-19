@@ -1,5 +1,4 @@
 const Service = require('../../models/Services');
-const { off } = require('../../models/User');
 
 // Create a new service
 const createService = async (req, res) => {
@@ -50,122 +49,91 @@ const getAllServices = async (req, res) => {
 // Update service
 const updateService = async (req, res) => {
   const { id } = req.params;
-  const { name, category } = req.body;
+  console.log("rewrew",req.params);
+  
+  const { name, category, offer } = req.body;
+  
 
   try {
-    const existingService = await Service.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') }, _id: { $ne: id } });
-    if (existingService) {
-      return res.status(400).json({ success: false, message: 'Service name already exists.' });
+    if (!name || !category || !offer) {
+      return res.status(400).json({ success: false, message: "Name and category are required." });
     }
 
-    const updatedService = await Service.findByIdAndUpdate(id, { name, category }, { new: true });
+    // Check for duplicate service name
+    const existingService = await Service.findOne({
+      name: { $regex: new RegExp(`^${name}$`, "i") },
+      _id: { $ne: id },
+    });
+    if (existingService) {
+      return res.status(400).json({ success: false, message: "Service name already exists." });
+    }
+
+    // Update icon only if a new file is uploaded
+    const updatedFields = { name, category, offer };
+    if (req.file) {
+      updatedFields.icon = req.file.location; // Assuming `req.file.location` holds the S3 URL
+    }
+
+    const updatedService = await Service.findByIdAndUpdate(id, updatedFields, { new: true });
     if (!updatedService) {
       return res.status(404).json({ success: false, message: "Service not found." });
     }
 
     res.status(200).json({ success: true, data: updatedService });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    console.error("Error updating service:", error);
+    res.status(500).json({ success: false, message: "Error updating service.", error: error.message });
   }
 };
+
 
 // Block/Unblock service
 const blockServices = async (req, res) => {
   const { id } = req.params;
+
   try {
     const service = await Service.findById(id);
     if (!service) {
-      return res.status(404).json({ message: 'Service not found' });
+      return res.status(404).json({ success: false, message: "Service not found." });
     }
 
     service.isBlocked = !service.isBlocked;
     await service.save();
-    res.status(200).json({ message: 'Service block status updated', service });
+
+    res.status(200).json({
+      success: true,
+      message: `Service ${service.isBlocked ? "blocked" : "unblocked"} successfully.`,
+      data: service,
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Error updating block status', error });
+    console.error("Error updating block status:", error);
+    res.status(500).json({ success: false, message: "Error updating block status.", error: error.message });
   }
 };
+
 
 // Delete service
 const deleteService = async (req, res) => {
-  try {
-    const service = await Service.findByIdAndDelete(req.params.id);
-    if (!service) return res.status(404).json({ message: 'Service not found' });
-    res.status(200).json({ message: 'Service deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Error deleting service', error: error.message });
-  }
-};
-
-// Add an offer to a service
-const addOffer = async (req, res) => {
-  const { id } = req.params;
-  const { offer } = req.body;
-
-  if (!offer || offer.trim() === "") {
-    return res.status(400).json({ success: false, message: 'Offer cannot be empty.' });
-  }
-
-  try {
-    const service = await Service.findById(id);
-    if (!service) {
-      return res.status(404).json({ success: false, message: 'Service not found.' });
-    }
-
-    service.offer = offer;  // Add the offer to the service
-    await service.save();  // Save the updated service
-
-    res.status(200).json({ success: true, message: 'Offer added successfully', service });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Error adding offer.', error: error.message });
-  }
-};
-
-// Edit an existing offer for a service
-const editOffer = async (req, res) => {
-  const { id } = req.params;
-  const { offer } = req.body;
-
-  if (!offer || offer.trim() === "") {
-    return res.status(400).json({ success: false, message: 'Offer cannot be empty.' });
-  }
-
-  try {
-    const service = await Service.findById(id);
-    if (!service) {
-      return res.status(404).json({ success: false, message: 'Service not found.' });
-    }
-
-    service.offer = offer;  // Edit the offer text
-    await service.save();  // Save the updated service
-
-    res.status(200).json({ success: true, message: 'Offer updated successfully', service });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Error updating offer.', error: error.message });
-  }
-};
-
-// Delete offer for a service
-const deleteOffer = async (req, res) => {
   const { id } = req.params;
 
   try {
     const service = await Service.findById(id);
     if (!service) {
-      return res.status(404).json({ success: false, message: 'Service not found.' });
+      return res.status(404).json({ success: false, message: "Service not found." });
     }
 
-    service.offer = '';  // Remove the offer
-    await service.save();  // Save the updated service
+    // Actual deletion (you may choose to soft-delete by setting a `deleted` flag)
+    await service.deleteOne();
 
-    res.status(200).json({ success: true, message: 'Offer deleted successfully', service });
+    res.status(200).json({ success: true, message: "Service deleted successfully." });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Error deleting offer.', error: error.message });
+    console.error("Error deleting service:", error);
+    res.status(500).json({ success: false, message: "Error deleting service.", error: error.message });
   }
 };
+
+
+
 
 module.exports = {
   createService,
@@ -173,7 +141,5 @@ module.exports = {
   updateService,
   blockServices,
   deleteService,
-  addOffer,
-  editOffer,
-  deleteOffer,
+
 };

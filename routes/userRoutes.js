@@ -1,11 +1,13 @@
 const express = require("express");
 require("dotenv").config();
+
 const UserController = require("../controllers/User/userController.js");
 const serviceController = require("../controllers/User/userServicesController.js");
 const ProfileController = require("../controllers/User/userProfielController.js");
 const BookingController=require('../controllers/User/userBookingController.js')
 const paymentController=require('../controllers/User/PaymentController.js')
 const chatController=require('../controllers/User/ChatController.js')
+const subscription=require('../controllers/User/SubscriptionController.js')
 const { sendOtp } = require("../middleware/otpMiddleware.js");
 const { checkBlock } = require("../middleware/IsBlocked.js");
 const passport = require("passport");
@@ -25,6 +27,7 @@ router.post("/reset-password", UserController.resetPasswordController);
 router.get("/getServices", serviceController.getAllServices);
 router.get('/getServices/:id',serviceController.getServicesById)
 router.get('/getOffers', serviceController.getOffers);
+router.get('/getCategory',serviceController.getCategories)
 
 // Banner
 router.get('/getBanner',UserController.getBanner)
@@ -62,7 +65,8 @@ router.put("/editAddress/:userId/:addressId", ProfileController.editAddress);
 router.get('/user/:id',ProfileController.getUser)
 
 // subscription
-router.get('/getPlans',ProfileController.getPlans)
+router.get('/getPlans',subscription.getPlans)
+router.post('/verifyPayment',subscription.verifyPayment)
 
 // search
 router.get('/services',serviceController.search)
@@ -73,12 +77,14 @@ router.get('/availableWorker', BookingController.getAvailableWorkersByLocation);
 router.post('/book-service', BookingController.confirmBooking);
 router.get('/user-booking-history',BookingController.getUserBookingHistory); 
 router.post("/worker-payment",BookingController.userToWorkerPaymnet)
+router.get('/getBookingDetails', BookingController.getBookingDetails);
 
 // payment 
 router.post('/create-order', paymentController.createOrder);
+// feedback
+router.post('/submitFeedback',BookingController.sendFeedback)
 
 // caht
-
 router.get('/getWorkerDetail/:userId',chatController.getWorkerForUser)
 
 

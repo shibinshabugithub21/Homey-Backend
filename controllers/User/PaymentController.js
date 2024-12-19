@@ -16,7 +16,6 @@ console.log("amount",req.body);
     if (!amount) {
         return res.status(400).json({ error: 'Amount is required' }); 
     }
-
     const options = {
         amount: amount * 100, 
         currency: 'INR',
