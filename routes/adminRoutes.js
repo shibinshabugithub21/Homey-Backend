@@ -71,7 +71,10 @@ router.get('/getWorker',DashboardController.getWorkerCount)
 router.get('/getService', DashboardController.getServiceCount);
 router.get('/getBooking', DashboardController.getBookingCount);
 router.get('/getLocation', DashboardController.getLocationCount);
-router.get('/getMostUsedServices', DashboardController.getMostUsedServices);
+router.get('/revenue',DashboardController.getRevenue)
+router .get('/services-status',DashboardController.servicesStaus)
+router.get('/mostBookedServices', DashboardController.mostUsedServices);
+
 
 // subscription
 router.get('/getPlans',SubscriptionController.getPlans)

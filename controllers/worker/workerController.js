@@ -3,7 +3,8 @@ const Otp = require('../../models/OTP');
 const bcrypt = require('bcryptjs'); 
 const jwt = require('jsonwebtoken'); 
 const crypto = require("crypto");
-const {sendLeaveApplicationNotification,sendResetPasswordEmail}=require('../../services/emailServices')
+const {sendLeaveApplicationNotification,sendResetPasswordEmail}=require('../../services/emailServices');
+const { getLocation } = require('../User/userServicesController');
 
 // Signup 
 const registerWorker = async (req, res) => {
@@ -339,6 +340,14 @@ const resetPasswordWorker=async (req,res) => {
       res.status(500).json({ message: "An error occurred during password reset." });
     }
 }
+const currentLocation= async (req, res) => {
+  try {
+    const response = await axios.get(`https://ipinfo.io/json?token=${process.env.Access_Token}`);
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: "Unable to fetch location" });
+  }
+}
 module.exports = {
     registerWorker,
     workerLogin,
@@ -349,5 +358,6 @@ module.exports = {
     getLeave,
     googleCallBack,
     forgetPasswordWorker,
-    resetPasswordWorker
+    resetPasswordWorker,
+    currentLocation
 };
