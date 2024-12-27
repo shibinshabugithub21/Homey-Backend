@@ -49,8 +49,6 @@ const confirmBooking = async (req, res) => {
 
       const updatedBooking = await existingBooking.save();
       console.log("Updated booking saved:", updatedBooking);
-
-      // Add the selected date to the worker's bookingDates array if it doesn't already exist
       if (worker) {
         if (!worker.bookingDates.includes(selectedDate)) {
           worker.bookingDates.push(selectedDate);
@@ -142,6 +140,7 @@ const getAvailableWorkersByLocation = async (req, res) => {
   console.log("Request Query:", req.query);
 
   try {
+    console.log("filter satert");
     
     const availableWorkers = await Worker.find({
       location, 
@@ -149,6 +148,7 @@ const getAvailableWorkersByLocation = async (req, res) => {
       availabilityStatus: "Available", // Only show workers with availability status "Available"
       bookingDates: { $nin: [date] }  // Exclude workers who have the selected date in their bookingDates array
     });
+    console.log("filter stpo");
 
     console.log("Available Workers:", availableWorkers); 
 

@@ -20,6 +20,7 @@ router.post('/WorkerVerify-otp', workerController.verifyOTP);
 router.get('/getWorker/:id', workerController.getWorker);
 router.post('/workerForget-password',workerController.forgetPasswordWorker)
 router.post('/WorkerReset-password',workerController.resetPasswordWorker)
+router.get('/location',workerController.currentLocation)
 // worker Avaliblity
 router.put("/updateWorker/:id", workerController.updateWorker);
 // leave settup

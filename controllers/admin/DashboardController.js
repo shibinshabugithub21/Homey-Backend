@@ -55,50 +55,105 @@ const getWorkerCount = async (req, res) => {
     }
   };
 
-  const getMostUsedServices = async (req, res) => {
-    console.log("erewre");
-    
+
+  
+  const getRevenue=async (req, res) => {
     try {
-      console.log("Fetching most used services");
+      console.log("revent staet");
+      
+      const revenueData = await Booking.aggregate([
+        {
+          $group: {
+            _id: { $month: "$date" }, // Group by month
+            totalRevenue: { $sum: "$amount" }, // Sum up the 'amount' field
+          },
+        },
+        { $sort: { _id: 1 } }, // Sort by month
+      ]);
   
-      // Get all bookings
-      const bookings = await Booking.find().populate('services');
-      if (!bookings || bookings.length === 0) {
-        return res.status(400).json({ message: 'No bookings found' });
-      }
+      const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      const revenueByMonth = revenueData.map((item) => ({
+        month: months[item._id - 1],
+        totalRevenue: item.totalRevenue,
+      }));
   
-      // Create an empty object to hold the count of bookings for each service
-      const serviceBookingCount = {};
-  
-      // Loop through the bookings to count bookings for each service
-      bookings.forEach(booking => {
-        if (booking.services && booking.services.name) {
-          const serviceName = booking.services.name;
-          if (serviceBookingCount[serviceName]) {
-            serviceBookingCount[serviceName] += 1;
-          } else {
-            serviceBookingCount[serviceName] = 1;
-          }
-        }
-      });
-  
-      // Convert the counts into an array and sort them
-      const serviceCounts = Object.entries(serviceBookingCount)
-        .map(([serviceName, count]) => ({ serviceName, count }))
-        .sort((a, b) => b.count - a.count);
-  
-      // Return the top 5 most booked services
-      const topServices = serviceCounts.slice(0, 5);
-  console.log("res",topServices);
-  
-      return res.status(200).json({ services: topServices });
-  
+      res.json(revenueByMonth);
     } catch (error) {
-      console.error("Error fetching most booked services:", error);
-      res.status(500).json({ message: "Error fetching most booked services", error: error.message });
+      console.error(error);
+      res.status(500).send('Error fetching revenue data');
     }
   };
-  
-  
 
-module.exports={getUserCount,getWorkerCount,getLocationCount,getServiceCount,getBookingCount,getMostUsedServices}  
+
+const servicesStaus = async (req, res) => {
+  try {
+    const statusData = await Booking.aggregate([
+      {
+        $group: {
+          _id: "$status", 
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const data = {
+      Completed: 0,
+      Cancelled: 0,
+      Pending: 0,
+      'In-Progress': 0
+    };
+
+    statusData.forEach(item => data[item._id] = item.count);
+    console.log("data",data);
+    
+    res.json(data);
+    
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching service status data');
+  }
+};
+  
+const mostUsedServices = async (req, res) => {
+  try {
+    // Aggregate bookings by serviceId and get counts
+    const serviceBookings = await Booking.aggregate([
+      {
+        $lookup: {
+          from: "services",
+          localField: "services",  // Match with your booking schema field
+          foreignField: "name",    // Match with your service schema field
+          as: "serviceDetails"
+        }
+      },
+      {
+        $unwind: "$serviceDetails"
+      },
+      {
+        $group: {
+          _id: "$serviceDetails._id",
+          name: { $first: "$serviceDetails.name" },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { count: -1 }
+      }
+    ]);
+
+    // Format the response
+    const data = serviceBookings.map(service => ({
+      name: service.name,
+      count: service.count
+    }));
+
+    res.status(200).json(data);
+  } catch (error) {
+    console.error("Error fetching most booked services:", error);
+    res.status(500).json({ error: "Error fetching most booked services" });
+  }
+};
+
+
+module.exports={getUserCount,getWorkerCount,getLocationCount,mostUsedServices,getServiceCount,getBookingCount,getRevenue,servicesStaus}  
